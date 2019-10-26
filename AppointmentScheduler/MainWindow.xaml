@@ -1,0 +1,167 @@
+﻿<Window x:Class="AppointmentScheduler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cm="clr-namespace:AppointmentScheduler.View"
+        xmlns:local="clr-namespace:AppointmentScheduler"
+        xmlns:util="clr-namespace:AppointmentScheduler.Utils"
+        xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Scheduler">
+    <Window.Resources>
+        <ResourceDictionary>
+            <util:BooleanVisibilityConverter x:Key="boolVisCon"/>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Name:"/>
+                <TextBox Margin="3" VerticalContentAlignment="Center" Text="{Binding SiConfig.Name}" Grid.Row="0" Grid.Column="1" />
+
+                <Label Grid.Row="0" Grid.Column="2" Content="Category:"/>
+                <ComboBox Margin="3" Grid.Row="0" Name="cbxHCategory" Grid.Column="3" SelectedItem="{Binding SiConfig.SelectedCategory, UpdateSourceTrigger=PropertyChanged}"
+                                                  ItemsSource="{Binding SiConfig.Category}" DisplayMemberPath="CategoryName" />
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Start:"/>
+                <wpfx:DateTimePicker Margin="3" x:Name="dtpHStart" Grid.Row="1" Grid.Column="1" Value="{Binding SiConfig.StartTime, Mode=TwoWay}" />
+
+                <Label Grid.Row="2" Grid.Column="0" Content="End:"/>
+                <wpfx:DateTimePicker Margin="3" x:Name="dtpHEnd" Value="{Binding SiConfig.EndTime, Mode=TwoWay}" Grid.Row="2" Grid.Column="1"/>
+
+                <Grid Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Column="0" Grid.Row="0" Margin="3" Text="Agenda:" FontSize="15"/>
+
+                    <ItemsControl Grid.Column="0" Grid.Row="1" ItemsSource="{Binding SiConfig.Category, UpdateSourceTrigger=PropertyChanged}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Margin="3" Width="15" Height="15" Stroke="Black"  StrokeThickness="0.5" Fill="{Binding CategoryColor}">
+                                        <!--<Ellipse.Style>
+                                            <Style TargetType="{x:Type Ellipse}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Lunch Break">
+                                                        <Setter Property="Fill" Value="Aqua"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Short Break">
+                                                        <Setter Property="Fill" Value="Chocolate"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Maintenance Break">
+                                                        <Setter Property="Fill" Value="Red"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Regular Break">
+                                                        <Setter Property="Fill" Value="LightGreen"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Public Holiday">
+                                                        <Setter Property="Fill" Value="MediumPurple"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding EN}" Value="Religious Holiday">
+                                                        <Setter Property="Fill" Value="LightYellow"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>-->
+                                    </Ellipse>
+                                    <TextBlock VerticalAlignment="Center" Margin="3" Text="{Binding CategoryName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="2" Columns="3"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <Button Margin="3" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Add" Command="{Binding AddAppointmentCommand}"/>
+                </Grid>
+            </Grid>
+            <!--Calendar-->
+            <cm:CalendarDayView Grid.Row="1" Visibility="{Binding SiConfig.DayViewV,
+                       Converter={StaticResource boolVisCon}, FallbackValue=Collapsed, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
+            <cm:CalendarMonthView Grid.Row="1" Visibility="{Binding SiConfig.MonthViewV,
+                       Converter={StaticResource boolVisCon}, FallbackValue=Visible, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
+        </Grid>
+
+        <Grid Visibility="{Binding SiConfig.EditViewV, Converter={StaticResource boolVisCon},
+                FallbackValue=Collapsed, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+            <Button Command="{Binding ExitEditCommand}" >
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid Opacity="0.7" Background="Gray"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Grid Width="450" Background="White" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Margin="3">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Edit" Margin="3" FontSize="16" FontWeight="DemiBold"/>
+                        <Button Grid.Column="1" Grid.Row="0" Content="Back" Command="{Binding ExitEditCommand}" HorizontalAlignment="Right"/>
+
+                        <TextBlock Margin="3" Grid.Column="0" Grid.Row="1" Text="Name"/>
+                        <TextBox Padding="0 0 3 0" Margin="3" Grid.Column="1" TextAlignment="Right" Text="{Binding SiConfig.AppointmentToEdit.Name}" Grid.Row="1"/>
+
+                        <TextBlock Margin="3" Grid.Column="0" Grid.Row="2" Text="Start"/>
+                        <wpfx:DateTimePicker Margin="3" Text="{Binding SiConfig.AppointmentToEdit.DisplayStartTime}" x:Name="dtpStartdEdit" Grid.Row="2" Grid.Column="1" />
+
+                        <TextBlock Margin="3" Grid.Column="0" Grid.Row="4" Text="End"/>
+                        <wpfx:DateTimePicker x:Name="dtpValidToEdit" Grid.Column="1" Text="{Binding SiConfig.AppointmentToEdit.EndTime, Mode=TwoWay}" Grid.Row="4" Margin="3"/>
+
+                        <TextBlock Margin="3" Grid.Row="5" VerticalAlignment="Center" Grid.Column="0" Text="Category"/>
+                        <ComboBox Margin="3" Grid.Row="5" Grid.Column="1" SelectedItem="{Binding SiConfig.AppointmentToEdit.Category, UpdateSourceTrigger=PropertyChanged}"
+                                                    ItemsSource="{Binding SiConfig.Category}" DisplayMemberPath="CategoryName" />
+
+                        <StackPanel Grid.Column="1" Grid.Row="7" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button Content="Save" Command="{Binding SaveEditedAppointmentCommand}" Margin="3"/>
+                            <Button Content="Delete" Command="{Binding ExecuteDeleteCommand}" Margin="3"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
